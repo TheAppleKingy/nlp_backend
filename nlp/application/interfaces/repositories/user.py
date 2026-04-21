@@ -1,0 +1,9 @@
+from typing import Protocol, Optional
+
+from nlp.domain.entities import User
+
+
+class UserRepositoryInterface(Protocol):
+    async def get_by_id(self, user_id: int) -> Optional[User]: ...
+    async def get_by_email(self, email: str) -> Optional[User]: ...
+    async def get_user_project_tasks(self, user_id: int, project_id: int) -> Optional[User]: ...

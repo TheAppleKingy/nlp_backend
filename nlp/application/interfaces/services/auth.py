@@ -1,0 +1,6 @@
+from typing import Protocol, Optional
+
+
+class AuthServiceInterface(Protocol):
+    def get_user_id(self, token: str) -> Optional[int]: ...
+    def generate_user_token(self, user_id: int) -> str: ...

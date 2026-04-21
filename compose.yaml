@@ -1,0 +1,49 @@
+services:
+  nlp_app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./:/app
+    command: uvicorn nlp.main:app --host 0.0.0.0 --port 8000 --reload
+    env_file:
+      - .env
+    depends_on:
+      nlp_db:
+        condition: service_started
+      nlp_rabbitmq:
+        condition: service_healthy
+
+
+  nlp_db:
+    image: postgres:18-alpine
+    volumes:
+      - nlp_db_data:/var/lib/postgresql
+    hostname: database
+    env_file:
+      - .env
+    ports:
+      - "5432:5432"
+
+  nlp_rabbitmq:
+    image: rabbitmq:management-alpine
+    hostname: rabbitmq
+    volumes:
+      - nlp_rabbit_data:/var/lib/rabbitmq
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "status"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+    ports:
+      - "15672:15672"
+
+
+volumes:
+  nlp_db_data:
+  nlp_rabbit_data:
